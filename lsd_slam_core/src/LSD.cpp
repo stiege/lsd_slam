@@ -38,12 +38,10 @@
 
 #include "opencv2/opencv.hpp"
 
-#include "GUI.h"
-
 std::vector<std::string> files;
 int w, h, w_inp, h_inp;
 ThreadMutexObject<bool> lsdDone(false);
-GUI gui;
+
 RawLogReader * logReader = 0;
 int numFrames = 0;
 
@@ -134,7 +132,7 @@ int getFile (std::string source, std::vector<std::string> &files)
 
 using namespace lsd_slam;
 
-void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputWrapper, Sophus::Matrix3f K)
+void run(SlamSystem * system, Undistorter* undistorter, Sophus::Matrix3f K)
 {
     // get HZ
     double hz = 30;
@@ -189,8 +187,6 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
             system->trackFrame(image.data, runningIDX, hz == 0, fakeTimeStamp);
         }
 
-        gui.pose.assignValue(system->getCurrentPoseEstimateScale());
-
         runningIDX++;
         fakeTimeStamp+=0.03;
 
@@ -200,7 +196,6 @@ void run(SlamSystem * system, Undistorter* undistorter, Output3DWrapper* outputW
             delete system;
 
             system = new SlamSystem(w, h, K, doSlam);
-            system->setVisualization(outputWrapper);
 
             fullResetRequested = false;
             runningIDX = 0;
@@ -244,13 +239,9 @@ int main( int argc, char** argv )
 	Resolution::getInstance(w, h);
 	Intrinsics::getInstance(fx, fy, cx, cy);
 
-	gui.initImages();
-
-	Output3DWrapper* outputWrapper = new PangolinOutput3DWrapper(w, h, gui);
 
 	// make slam system
 	SlamSystem * system = new SlamSystem(w, h, K, doSlam);
-	system->setVisualization(outputWrapper);
 
 
 	// open image files: first try to open as file.
@@ -290,25 +281,7 @@ int main( int argc, char** argv )
         numFrames = (int)files.size();
     }
 
-	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
-
-	while(!pangolin::ShouldQuit())
-	{
-	    if(lsdDone.getValue() && !system->finalized)
-	    {
-	        system->finalize();
-	    }
-
-	    gui.preCall();
-
-	    gui.drawKeyframes();
-
-	    gui.drawFrustum();
-
-	    gui.drawImages();
-
-	    gui.postCall();
-	}
+	boost::thread lsdThread(run, system, undistorter, K);
 
 	lsdDone.assignValue(true);
 
@@ -316,6 +289,5 @@ int main( int argc, char** argv )
 
 	delete system;
 	delete undistorter;
-	delete outputWrapper;
 	return 0;
 }
