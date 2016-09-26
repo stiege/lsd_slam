@@ -23,7 +23,7 @@ add_definitions("-DENABLE_SSE")
 
 # Also add some useful compiler flag
 set(CMAKE_CXX_FLAGS
-   "${CMAKE_CXX_FLAGS} -msse4.1 -msse3 -msse2 -msse -march=native -O3 -std=c++0x"
+   "${CMAKE_CXX_FLAGS} -msse4.1 -msse3 -msse2 -msse -march=native -O3 -std=c++0x -pthread"
 ) 
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g") 
@@ -117,4 +117,11 @@ target_link_libraries(lsdslam ${FABMAP_LIB} ${Boost_LIBRARIES} ${OpenCV_LIBS} ${
 add_executable(LSD LSD.cpp)
 target_link_libraries(LSD lsdslam)
 
+## Build a local copy of gtest (as per the GTest FAQ)
+include(${CMAKE_SOURCE_DIR}/cmake/BuildGTestLibraries.cmake )
+#add_subdirectory( test/unit/logger )
+#add_subdirectory( test/unit/lsd_core )
+# /TEST
+
+include(${CMAKE_SOURCE_DIR}/DataStructures/DataStructures.cmake)
 add_custom_target( deps DEPENDS ${EXTERNAL_PROJECTS} )

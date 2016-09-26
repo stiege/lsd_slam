@@ -9,11 +9,11 @@
 include(ExternalProject)
 
 ExternalProject_Add( gtest
-			PREFIX ${CMAKE_BINARY_DIR}/gtest
-			GIT_REPOSITORY "https://github.com/google/googletest"
-			CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/gtest"
-			BUILD_COMMAND ${EXTERNAL_PROJECT_MAKE_COMMAND}
-			INSTALL_DIR ${CMAKE_BINARY_DIR}/gtest )
+            PREFIX ${CMAKE_BINARY_DIR}/gtest
+            GIT_REPOSITORY "https://github.com/google/googletest"
+            CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/gtest"
+            BUILD_COMMAND ${EXTERNAL_PROJECT_MAKE_COMMAND}
+            INSTALL_DIR ${CMAKE_BINARY_DIR}/gtest )
 
 ExternalProject_Get_Property( gtest INSTALL_DIR )
 
